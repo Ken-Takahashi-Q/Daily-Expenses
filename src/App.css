@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Concert+One&family=Poppins:wght@400;700&display=swap');
+
+
+* {
+  font-family: 'Poppins', sans-serif;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  transition: 0.5s;
+}
+
+:root {
+  --bg-app: rgb(142, 170, 142);
+  --bg-data: rgb(126, 167, 126);
+  --bg-add-new: rgb(90, 113, 91);
+}
+.app {
+  min-height: 100vh;
+  padding: 2rem;
+  background-color: var(--bg-app);
+}
+.app_title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.app_title h1 {
+  font-family: 'Concert One', cursive;
+  text-align: center;
+}
+
+.add_new {
+  width: 70%;
+  padding: 1rem;
+  background-color: var(--bg-add-new);
+  border-radius: 1rem;
+
+}
