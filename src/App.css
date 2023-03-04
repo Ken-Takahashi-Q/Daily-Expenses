@@ -11,7 +11,9 @@
 :root {
 	--bg-app: rgb(142, 170, 142);
 	--bg-data: rgb(126, 167, 126);
-	--bg-add-new: rgb(90, 113, 91);
+	--bg-add-new: rgb(164, 186, 165);
+	--income-color: #60d160;
+	--payment-color: #e06648;
 }
 .app {
 	display: flex;
@@ -48,24 +50,24 @@
 	display: flex;
 	flex-direction: column;
 	gap: 1rem;
-	width: 70%;
+	width: 600px;
+	margin: 1rem;
 	padding: 1rem;
 	background-color: var(--bg-add-new);
 	border-radius: 1rem;
 }
 
-.label-inputs {
-	display: flex;
-	align-items: center;
-	width: 100%;
-	gap: 1rem;
-	color: white;
-	font-size: 16px;
-}
-.type-cat {
-	align-items: start;
+.custom_button {
+    background-color: #fff;
+    width: 6rem;
+    text-align: center;
 }
 
-/* label {
-	width: 3rem;
-} */
+.ant-radio-button-wrapper {
+    transition: all 0s ease;
+}
+
+.button_container {
+    display: flex;
+    justify-content: center;
+}

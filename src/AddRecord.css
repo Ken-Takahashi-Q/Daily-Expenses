@@ -1,34 +1,27 @@
 :root {
     --income-color: #60d160;
     --payment-color: #e06648;
-  }
+}
 
-.custom_button_type {
+.custom_button {
     background-color: #fff;
     width: 6rem;
     text-align: center;
 }
+
 .ant-radio-button-wrapper {
     transition: all 0s ease;
 }
-
-/* .custom_button_cat.ant-radio-button-wrapper-checked {
-    background-color: var(--income-color) !important;
-    color: white !important;
-} */
 
 /* Cancel default that makes them blue when not(:checked) and hovered
 .ant-radio-button-wrapper:not(:checked):hover {
     color: white;
 } */
 
-.custom_button_cat {
-    width: 6rem;
-    text-align: center;
-    color: black;
+.button_container {
+    display: flex;
+    justify-content: center;
 }
-.custom_button_cat {
-    width: 6rem;
-    text-align: center;
-    color: black;
-}
+/* .submit_button {
+    background-color: #000000;
+} */
