@@ -1,23 +1,50 @@
 import React, { useState } from 'react';
 import './App.css';
 import { Form, Input, TimePicker, DatePicker, Radio, InputNumber, Button, Table } from 'antd';
-
 import moment from 'moment';
-// import RecordForm from './RecordForm';
-// import RecordTable from './RecordTable';
-// import AddRecord from './AddRecord';
 
 function App() {
-	// จะให้ช่องกรอกโผล่เมื่อกด add new เท่านั้น ยังไม่ทำ
+	// Show input form when isAddNew
 	const [isAddNew, setIsAddNew] = useState(false);
 
-	// Record data
-	const [nameInput, setNameInput] = useState('');
-	const [dateInput, setDateInput] = useState('');
-	const [timeInput, setTimeInput] = useState('');
-	const [typeInput, setTypeInput] = useState('');
-	const [category, setCategory] = useState('');
-	const [amount, setAmount] = useState('');
+	// For adding categories
+	const [incomeCat, setIncomeCat] = useState(['salary', 'bonus', 'investment', 'sell', 'borrow', 'others']);
+	const [addIncomeCat, setAddIncomeCat] = useState('');
+
+	const [paymentCat, setPaymentCat] = useState(['food', 'travel', 'grocery', 'shopping', 'rental', 'bill', 'refund', 'others']);
+	const [addPaymentCat, setAddPaymentCat] = useState('');
+
+	const handleIncomeTyping = (e) => {
+		setAddIncomeCat(e.target.value);
+	};
+	const handlePaymentTyping = (e) => {
+		setAddPaymentCat(e.target.value);
+	};
+
+	const handleAddIncomeCat = () => {
+		if (addIncomeCat !== '') {
+			setIncomeCat([...incomeCat, addIncomeCat]);
+			setAddIncomeCat('');
+		}
+	};
+	const handleAddPaymentCat = () => {
+		if (addPaymentCat !== '') {
+			setPaymentCat([...paymentCat, addPaymentCat]);
+			setAddPaymentCat('');
+		}
+	};
+	  
+	// Changing color depends on type
+	const [selectedButton, setSelectedButton] = useState(null);
+	const [selectedCat, setSelectedCat] = useState(null);
+
+	const handleTypeChange = (e) => {
+		setSelectedButton(e.target.value);
+	};
+
+	const handleCatChange = (e) => {
+		setSelectedCat(e.target.value);
+	};
 
 	// Formats of table
 	const columns = [
@@ -68,18 +95,6 @@ function App() {
 		});
 	};
 
-	// Changing color depends on type
-	const [selectedButton, setSelectedButton] = useState(null);
-	const [selectedCat, setSelectedCat] = useState(null);
-
-	const handleTypeChange = (e) => {
-		setSelectedButton(e.target.value);
-	};
-
-	const handleCatChange = (e) => {
-		setSelectedCat(e.target.value);
-	};
-
 	// Get date and time to use as default
 	const now = moment();
 
@@ -89,12 +104,15 @@ function App() {
 				<h1>Expense Tracker</h1>
 			</div>
 					
-			<Table dataSource={data} columns={columns} />
+			<Table dataSource={data} columns={columns} style={{width: "100%", marginBottom: "2rem"}} />
 
-			{/* <form className="add_new" onClick={() => setIsAddNew(true)}>
-			</form> */}
+			<Button onClick={() => setIsAddNew(true)} style={{marginBottom: "1rem"}}>
+				Add a record
+			</Button>
 
-			<Form form={form} onFinish={handleSubmit}>
+			{isAddNew && (
+				<div className={`add_new ${isAddNew ? 'slide-up' : ''}`}>
+				<Form form={form} onFinish={handleSubmit}>
 
 				<Form.Item label="Name" name="activity">
 					<Input placeholder="Activity" name="activity" />
@@ -128,122 +146,54 @@ function App() {
 				<Form.Item label="Category">
 					{selectedButton === 'income' && (
 						<Radio.Group buttonStyle="solid" onChange={handleCatChange}>
-						<Radio.Button
-							value="salary"
-							className="custom_button"
-							style={{ background: selectedCat === 'salary' ? 'var(--income-color)' : 'white' }}
-						>
-							Salary
-						</Radio.Button>
+						
+						{/* Render income buttons using incomeCat */}
+						{incomeCat.map((category) => {
+							console.log("category:", category);
+							return (
+								<Radio.Button
+								key={category}
+								value={category}
+								className="custom_button"
+								style={{ background: selectedCat === category ? 'var(--income-color)' : 'white' }}
+								>
+								{category}
+								</Radio.Button>
+							)
+						})};
 
-						<Radio.Button
-							value="bonus"
-							className="custom_button"
-							style={{ background: selectedCat === 'bonus' ? 'var(--income-color)' : 'white' }}
-						>
-							Bonus
-						</Radio.Button>
+						{/* Add new incomeCat */}
+						<div style={{display: "flex", marginTop: "1rem"}}>
+							<Input placeholder="Add new income category" value={addIncomeCat} onChange={handleIncomeTyping} />
+							<Button type="primary" onClick={handleAddIncomeCat}>Add</Button>
+						</div>
 
-						<Radio.Button
-							value="investment"
-							className="custom_button"
-							style={{ background: selectedCat === 'investment' ? 'var(--income-color)' : 'white' }}
-						>
-							Investment
-						</Radio.Button>
-
-						<Radio.Button
-							value="sell"
-							className="custom_button"
-							style={{ background: selectedCat === 'sell' ? 'var(--income-color)' : 'white' }}
-						>
-							Sell
-						</Radio.Button>
-
-						<Radio.Button
-							value="borrow"
-							className="custom_button"
-							style={{ background: selectedCat === 'borrow' ? 'var(--income-color)' : 'white' }}
-						>
-							Borrow
-						</Radio.Button>
-
-						<Radio.Button
-							value="others"
-							className="custom_button"
-							style={{ background: selectedCat === 'others' ? 'var(--income-color)' : 'white' }}
-						>
-							Others
-						</Radio.Button>
 						</Radio.Group>
 					)}
 					
 					{selectedButton === 'payment' && (
 						<Radio.Group buttonStyle="solid" onChange={handleCatChange}>
-						<Radio.Button
-							value="food"
-							className="custom_button"
-							style={{ background: selectedCat === 'food' ? 'var(--payment-color)' : 'white' }}
-						>
-							Food
-						</Radio.Button>
+						{/* Render payment buttons using paymentCat */}
+						{paymentCat.map((category) => {
+							console.log("category:", category);
+							return (
+								<Radio.Button
+								key={category}
+								value={category}
+								className="custom_button"
+								style={{ background: selectedCat === category ? 'var(--payment-color)' : 'white' }}
+								>
+								{category}
+								</Radio.Button>
+							)
+						})};
 
-						<Radio.Button
-							value="travel"
-							className="custom_button"
-							style={{ background: selectedCat === 'travel' ? 'var(--payment-color)' : 'white' }}
-						>
-							Travel
-						</Radio.Button>
-
-						<Radio.Button
-							value="grocery"
-							className="custom_button"
-							style={{ background: selectedCat === 'grocery' ? 'var(--payment-color)' : 'white' }}
-						>
-							Grocery
-						</Radio.Button>
-
-						<Radio.Button
-							value="shopping"
-							className="custom_button"
-							style={{ background: selectedCat === 'shopping' ? 'var(--payment-color)' : 'white' }}
-						>
-							Shopping
-						</Radio.Button>
-
-						<Radio.Button
-							value="rental"
-							className="custom_button"
-							style={{ background: selectedCat === 'rental' ? 'var(--payment-color)' : 'white' }}
-						>
-							Rental
-						</Radio.Button>
-
-						<Radio.Button
-							value="bill"
-							className="custom_button"
-							style={{ background: selectedCat === 'bill' ? 'var(--payment-color)' : 'white' }}
-						>
-							Bill
-						</Radio.Button>
-
-						<Radio.Button
-							value="payback"
-							className="custom_button"
-							style={{ background: selectedCat === 'payback' ? 'var(--payment-color)' : 'white' }}
-						>
-							Refund
-						</Radio.Button>
-
-						<Radio.Button
-							value="others"
-							className="custom_button"
-							style={{ background: selectedCat === 'others' ? 'var(--payment-color)' : 'white' }}
-						>
-							Others
-						</Radio.Button>
-					</Radio.Group>
+						{/* Add new paymentCat */}
+						<div style={{display: "flex", marginTop: "1rem"}}>
+							<Input placeholder="Add new payment category" value={addPaymentCat} onChange={handlePaymentTyping} />
+							<Button type="primary" onClick={handleAddPaymentCat}>Add</Button>
+						</div>
+						</Radio.Group>
 					)}
 				</Form.Item>
 
@@ -256,10 +206,13 @@ function App() {
 				</Form.Item>
 
 				<div className="button_container">
-					<Button type="primary" className="submit_button" onClick={handleSubmit}>Add</Button>
+					<Button type="primary" className="submit_button" onClick={handleSubmit} style={{width: "5rem"}}>Finish</Button>
+					<Button className="close_form" onClick={() => setIsAddNew(false)} style={{width: "5rem"}}>Cancel</Button>
 				</div>
 
-			</Form>
+				</Form>
+				</div>
+				)}
 
 		</div>
 	);

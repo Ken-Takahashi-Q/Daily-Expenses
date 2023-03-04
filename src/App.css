@@ -11,7 +11,7 @@
 :root {
 	--bg-app: rgb(142, 170, 142);
 	--bg-data: rgb(126, 167, 126);
-	--bg-add-new: rgb(164, 186, 165);
+	--bg-add-new: rgb(223, 226, 223);
 	--income-color: #60d160;
 	--payment-color: #e06648;
 }
@@ -49,13 +49,35 @@
 .add_new {
 	display: flex;
 	flex-direction: column;
+	position: absolute;
+	bottom: 0;
+	
 	gap: 1rem;
 	width: 600px;
 	margin: 1rem;
 	padding: 1rem;
-	background-color: var(--bg-add-new);
+	background-color: rgba(255, 255, 255, 0.6);
+	backdrop-filter: blur(5px);
 	border-radius: 1rem;
+	transition: 0.5s;
+	z-index: 10;
 }
+
+.slide-up {
+	animation: slide-up 0.3s ease-in-out;
+	transform: translateY(-20%);
+}
+@keyframes slide-up {
+	from {
+		transform: translateY(20%);
+		opacity: 0;
+}
+  
+	to {
+		transform: translateY(-20%);
+	  	opacity: 1;
+	}
+}  
 
 .custom_button {
     background-color: #fff;
@@ -70,4 +92,5 @@
 .button_container {
     display: flex;
     justify-content: center;
+	gap: 1rem;
 }
