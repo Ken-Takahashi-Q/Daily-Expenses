@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
-import { Input, TimePicker, DatePicker, Radio } from 'antd';
+import { Input, TimePicker, DatePicker, InputNumber  } from 'antd';
 import moment from 'moment';
 
 import RecordForm from './RecordForm';
@@ -9,9 +9,34 @@ import RadioSelector from './RadioSelector';
 
 function App() {
 	const [isAddNew, setIsAddNew] = useState(false);
-	const [records, setRecords] = useState([]);
-	
 
+	const [name, setName] = useState('');
+    const [type, setType] = useState('');
+    const [category, setCategory] = useState('');
+    const [amount, setAmount] = useState('');
+
+	const [records, setRecords] = useState([]);
+
+	// Add data
+	const handleSubmit = (event) => {
+        event.preventDefault();
+
+        const record = {
+        name: name,
+        type: type,
+        category: category,
+        amount: amount
+        };
+
+        // props.addRecord(record);
+
+        setName('');
+        setType('');
+        setCategory('');
+        setAmount('');
+    };
+
+	// Add data into table
 	const addRecord = (record) => {
 		setRecords([...records, record]);
 	};
@@ -33,24 +58,34 @@ function App() {
 			<RecordTable records={records} />
 			<RecordForm addRecord={addRecord} />
 
-			<div className="add_new">
-				<Input placeholder="Activity" />
-				<div className="date_picker">
-					<DatePicker defaultValue={now} />
+			<form className="add_new" onSubmit={handleSubmit}>
+				<div className='label-inputs'>
+					<label htmlFor="activity-input">Name</label>
+					<Input id="activity-input" placeholder="Activity" />
+				</div>
+				
+				<div className="label-inputs date_picker">
+					<label htmlFor="date-input">Date</label>
+					<DatePicker id="date-input" defaultValue={now} />
 					<TimePicker defaultValue={now} format={'HH:mm'} />
 				</div>
 
-				<RadioSelector />
-
-				<>
-				<Radio.Group buttonStyle="solid">
-					<Radio.Button value="a">Hangzhou</Radio.Button>
-					<Radio.Button value="b">Shanghai</Radio.Button>
-					<Radio.Button value="c">Beijing</Radio.Button>
-					<Radio.Button value="d">Chengdu</Radio.Button>
-				</Radio.Group>
-				</>
-			</div>
+				<div className="label-inputs type-cat">
+					<label htmlFor="type-input">Type</label>
+					<RadioSelector id="type-input" />
+				</div>
+				
+				<div className="label-inputs">
+					<label htmlFor="amount-input">Amount</label>
+					<InputNumber
+						id="amount-input"
+						placeholder="Amount"
+						min={0}
+						formatter={(value) => `฿ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+					/>
+				</div>
+				
+			</form>
 			
 		</div>
 	);

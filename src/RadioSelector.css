@@ -12,10 +12,10 @@
     transition: all 0s ease;
 }
 
-.custom_button_cat .ant-radio-button-wrapper-checked {
+/* .custom_button_cat.ant-radio-button-wrapper-checked {
     background-color: var(--income-color) !important;
     color: white !important;
-}
+} */
 
 /* Cancel default that makes them blue when not(:checked) and hovered
 .ant-radio-button-wrapper:not(:checked):hover {
