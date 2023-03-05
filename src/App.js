@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLocalStorage } from 'usehooks-ts'
 import './App.css';
-import { Form, Input, TimePicker, DatePicker, Radio, InputNumber, Button, Table, Popconfirm, Typography } from 'antd';
+import { Form, Input, TimePicker, DatePicker, Radio, InputNumber, Button, Table } from 'antd';
 import { CloseOutlined, DeleteOutlined } from '@ant-design/icons'
 import moment from 'moment';
 
@@ -75,7 +75,16 @@ function App() {
 		{
 			title: 'Activity',
 			dataIndex: 'activity',
-			sorter: (a, b) => a.activity.localeCompare(b.name),
+			sorter: (a, b) => {
+				if (a.activity === undefined || a.activity === null) {
+				  return -1;
+				}
+				if (b.activity === undefined || b.activity === null) {
+				  return 1;
+				}
+				return a.activity.localeCompare(b.activity);
+			  }
+			  
 		},
 		{
 			title: 'Date-time',
@@ -140,42 +149,39 @@ function App() {
 		setCatFilter(e.target.value);
 		setToggleEdit(false);
 		setToggleFind(!toggleFind);
-	}
-
+	};
 	const handleFilterCancel = () => {
 		setCatFilter(null);
 		setToggleFind(false);
-	}
+	};
 
 	// Edit existing category
 	const [toggleEdit, setToggleEdit] = useState(false);
 	const [catToDel, setCatToDel] = useState(null)
-	// const handleDelCat = (delCat) => {
-	// 	const allCat = [...incomeCat, ...paymentCat]
-	// 	setDelCat(allCat.filter((category) => category !== delCat));
-	// }
-	const handleEditCat = () => {
+
+	const handleEditCat = (e) => {
 		setToggleEdit(!toggleEdit);
 		setToggleFind(false);
 	};
-	
-	const handleDelSelect = (category) => {
-		setCatToDel(category);
+	const handleDelSelect = (e) => {
+		setCatToDel(e.target.value);
+		console.log(catToDel);
 	};
 	
 	const handleCatDel = () => {
 		if (catToDel) {
-		  const updatedCats = [...incomeCat];
-		  const index = updatedCats.indexOf(catToDel);
-		  if (index !== -1) {
-			updatedCats.splice(index, 1);
-			setIncomeCat(updatedCats);
+		  const updatedIncomeCat = incomeCat.filter(category => category !== catToDel);
+		  const updatedPaymentCat = paymentCat.filter(category => category !== catToDel);
+	  
+		  if (updatedIncomeCat.length !== incomeCat.length) {
+			setIncomeCat(updatedIncomeCat);
+		  } else if (updatedPaymentCat.length !== paymentCat.length) {
+			setPaymentCat(updatedPaymentCat);
 		  }
+	  
 		  setCatToDel(null);
 		}
-	  };
-	  
-	  
+	};
 
 	return (
 		<body>
@@ -191,9 +197,13 @@ function App() {
 			/>
 
 			{/* For filtering type and category */}
-			<div className="menus finding" style={{visibility: toggleFind ? 'visible': 'hidden', transition: "0s"}}>
+			<div className="menus" style={{visibility: toggleFind||toggleEdit ? 'visible': 'hidden', marginBottom: "1rem", transition: "0s"}}>
+			{/* Create unvisible box */}
+			{!toggleEdit ? 
+				<>
 				<>
 				<Radio.Group buttonStyle="solid" onChange={handleFilter}>
+					<Radio.Button value="income">Income</Radio.Button>
 					{/* Render income buttons using incomeCat */}
 					{incomeCat.map((category) => {
 						return (
@@ -205,7 +215,7 @@ function App() {
 							</Radio.Button>
 						)
 					})};
-
+					<Radio.Button value="payment">Payment</Radio.Button>
 					{paymentCat.map((category) => {
 						return (
 							<Radio.Button
@@ -222,25 +232,25 @@ function App() {
 				<div style={{ display: "flex", justifyContent: "center" }}>
 				<Button className="close_form" onClick={handleFilterCancel} style={{width: "5rem"}}>Cancel</Button>
 				</div>
-			</div>
-
-			{/* For deleting category */}
-			<div className="menus editing" style={{visibility: toggleEdit ? 'visible': 'hidden', transition: "0s"}}>
+				</> :
+				null
+			}
+			{toggleEdit ? 
+				<>
 				<>
 				<Radio.Group buttonStyle="solid" onChange={handleDelSelect}>
-					<Radio.Button value="income">Income</Radio.Button>
 					{incomeCat.map((category) => {
 						return (
-							<Radio.Button key={category} value={category}>
+							<Radio.Button key={category} value={category}
+							check={category===catToDel}>
 								{category}
 							</Radio.Button>
 						)
 					})};
 
-					<Radio.Button value="payment">Payment</Radio.Button>
 					{paymentCat.map((category) => {
 						return (
-							<Radio.Button key={category} value={category} >
+							<Radio.Button key={category} value={category} check={category===catToDel}>
 								{category}
 							</Radio.Button>
 						)
@@ -252,6 +262,9 @@ function App() {
 					<Button onClick={handleCatDel} icon={<DeleteOutlined />} style={{width: "5rem", backgroundColor: "#ff6947"}}/>
 					<Button className="close_form" onClick={() => setToggleEdit(false)} style={{width: "5rem"}}>Cancel</Button>
 				</div>
+				</> :
+				null
+			}
 			</div>
 
 			{/* 3 buttons, Filter, Add new, Edit cat */}
@@ -269,7 +282,7 @@ function App() {
 				<Button
 					onClick={handleEditCat}
 					style={{height: "80%", width:"8rem", fontSize: "18px", fontWeight: "700", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
-					Edit category
+					Delete category
 				</Button>
 			</div>
 
@@ -349,7 +362,7 @@ function App() {
 						<Radio.Group buttonStyle="solid" onChange={handleCatChange}>
 						{/* Render payment buttons using paymentCat */}
 						{paymentCat.map((category) => {
-							console.log("category:", category);
+							// console.log("category:", category);
 							return (
 								<Radio.Button
 								key={category}

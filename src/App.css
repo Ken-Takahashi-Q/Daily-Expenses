@@ -49,11 +49,9 @@ body {
 
 .income_text_table {
 	color: var(--income-color);
-	font-weight: 700;
 }
 .payment_text_table {
 	color: var(--payment-color);
-	font-weight: 700;
 }
 
 .menu_container {
@@ -68,7 +66,7 @@ body {
 .menus {
 	display: flex;
 	flex-direction: column;
-	position: absolute;
+	width: 80%;
 	padding: 0.5rem 1rem 0.5rem 1rem;
 	gap: 1rem;
 	background-color: rgba(232, 232, 232, 0.7);
@@ -77,6 +75,9 @@ body {
 	box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 	transition: 0.5s;
 	z-index: 10;
+}
+.menus.editing {
+	background-color: rgb(159, 149, 44)(232, 232, 232, 0.7);
 }
 .buttons_container {
 	display: flex;
