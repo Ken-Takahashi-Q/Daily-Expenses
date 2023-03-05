@@ -9,7 +9,7 @@
 	}
 
 :root {
-	--bg-app: rgb(142, 170, 142);
+	--bg-app: rgb(190, 206, 190);
 	--bg-data: rgb(126, 167, 126);
 	--bg-add-new: rgb(223, 226, 223);
 	--income-color: #60d160;
@@ -30,6 +30,7 @@ body {
 	align-items: center;
 	justify-content: center;
 	margin-bottom: 1rem;
+	gap: 2rem;
 }
 .app_title h1 {
 	font-family: 'Concert One', cursive;

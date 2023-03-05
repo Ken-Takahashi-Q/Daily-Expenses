@@ -4,6 +4,7 @@ import './App.css';
 import { Form, Input, TimePicker, DatePicker, Radio, InputNumber, Button, Table } from 'antd';
 import { CloseOutlined, DeleteOutlined } from '@ant-design/icons'
 import moment from 'moment';
+import { PieChart, Pie, Cell } from 'recharts';
 
 function App() {
 	// Show input form when isAddNew
@@ -83,8 +84,7 @@ function App() {
 				  return 1;
 				}
 				return a.activity.localeCompare(b.activity);
-			  }
-			  
+			  },
 		},
 		{
 			title: 'Date-time',
@@ -145,15 +145,29 @@ function App() {
 	const [typeFilter, setTypeFilter] = useState(null);
 	const [catFilter, setCatFilter] = useState(null);
 	
+	const handleTypeFilter = (e) => {
+		setTypeFilter(e.target.value);
+		setToggleEdit(false);
+	};
 	const handleFilter = (e) => {
 		setCatFilter(e.target.value);
 		setToggleEdit(false);
-		setToggleFind(!toggleFind);
 	};
+	const handleShowAll = () => {
+		setCatFilter(null);
+		setTypeFilter(null);
+	}
 	const handleFilterCancel = () => {
 		setCatFilter(null);
 		setToggleFind(false);
 	};
+
+	// For the 'Filter' button only
+	const handleFilterToggle = (e) => {
+		setCatFilter(e.target.value);
+		setToggleFind(!toggleFind);
+		setToggleEdit(false);
+	}
 
 	// Edit existing category
 	const [toggleEdit, setToggleEdit] = useState(false);
@@ -183,14 +197,53 @@ function App() {
 		}
 	};
 
+	// Create circle chart
+	const [viewChart, setViewChart] = useState(false);
+	const dataByCategory = data.reduce((result, item) => {
+		if (!result[item.category]) {
+			result[item.category] = {
+				category: item.category,
+				amount: 0,
+			};
+		}
+		result[item.category].amount += parseFloat(item.amount);
+		return result;
+	}, {});
+
+	const chartData = Object.values(dataByCategory).sort((a, b) => b.amount - a.amount);
+	const chartColors = ['#0088fe', '#00c49f', '#ffbb28', '#ff8042', '#8884d8', '#ff7d7d', '#ce8ade'];
+	  
 	return (
 		<body>
 			<div className="app_title">
 				<h1>Expense Tracker</h1>
+				<Button type="primary" onClick={() => setViewChart(!viewChart)} style={{height: "100%", backgroundColor: viewChart ? "var(--payment-color)": ""}}>Overall</Button>
 			</div>
-					
+
+			<div style={{display: viewChart ? 'block' : 'none'}}>
+				<PieChart width={400} height={400}>
+				<Pie
+					data={chartData}
+					dataKey="amount"
+					nameKey="category"
+					cx="50%"
+					cy="50%"
+					outerRadius={80}
+					fill="#8884d8"
+					label={(entry) => `${entry.category} (${entry.amount}฿)`}
+				>
+					{chartData.map((entry, index) => (
+					<Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
+					))}
+				</Pie>
+				</PieChart>
+			</div>
+			
 			<Table
-				dataSource={catFilter ? data.filter((item) => item.category === catFilter) : data}
+				dataSource={data.filter((item) => 
+					(!catFilter || item.category === catFilter) && 
+					(!typeFilter || item.type === typeFilter)
+				)}
 				columns={columns}
 				style={{ width: "100%", height: "400px", marginBottom: "2rem"}}
 				pagination={{ defaultPageSize: 6 }}
@@ -198,12 +251,16 @@ function App() {
 
 			{/* For filtering type and category */}
 			<div className="menus" style={{visibility: toggleFind||toggleEdit ? 'visible': 'hidden', marginBottom: "1rem", transition: "0s"}}>
-			{/* Create unvisible box */}
+			{/* Create unvisible box, show filter buttons */}
 			{!toggleEdit ? 
 				<>
 				<>
-				<Radio.Group buttonStyle="solid" onChange={handleFilter}>
+				<Radio.Group buttonStyle="solid" onChange={handleTypeFilter}>
 					<Radio.Button value="income">Income</Radio.Button>
+					<Radio.Button value="payment">Payment</Radio.Button>
+				</Radio.Group>
+
+				<Radio.Group buttonStyle="solid" onChange={handleFilter}>
 					{/* Render income buttons using incomeCat */}
 					{incomeCat.map((category) => {
 						return (
@@ -215,7 +272,7 @@ function App() {
 							</Radio.Button>
 						)
 					})};
-					<Radio.Button value="payment">Payment</Radio.Button>
+					
 					{paymentCat.map((category) => {
 						return (
 							<Radio.Button
@@ -229,12 +286,14 @@ function App() {
 				</Radio.Group>
 				</>
 
-				<div style={{ display: "flex", justifyContent: "center" }}>
+				<div style={{ display: "flex", justifyContent: "center", gap: "1rem" }}>
+				<Button type="primary" className="close_form" onClick={handleShowAll} style={{width: "5rem", backgroundColor: "var(--add-btn-color)"}}>Show all</Button>
 				<Button className="close_form" onClick={handleFilterCancel} style={{width: "5rem"}}>Cancel</Button>
 				</div>
 				</> :
 				null
 			}
+			{/* Delete category buttons */}
 			{toggleEdit ? 
 				<>
 				<>
@@ -270,18 +329,18 @@ function App() {
 			{/* 3 buttons, Filter, Add new, Edit cat */}
 			<div className="buttons_container" style={{visibility: isAddNew ? 'hidden' : 'visible'}}>
 				<Button
-					onClick={handleFilter}
-					style={{height: "80%", width:"8rem", fontSize: "18px", fontWeight: "700", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
+					onClick={handleFilterToggle}
+					style={{height: "80%", width:"8rem", fontSize: "18px", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
 					Filter
 				</Button>
 
-				<Button onClick={handleAddNew} style={{height: "100%", width:"8rem", color: "white", backgroundColor: "var(--add-btn-color)", fontSize: "18px", fontWeight: "700", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
+				<Button onClick={handleAddNew} style={{height: "100%", width:"8rem", color: "white", backgroundColor: "var(--add-btn-color)", fontSize: "18px", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
 					Add new
 				</Button>
 
 				<Button
 					onClick={handleEditCat}
-					style={{height: "80%", width:"8rem", fontSize: "18px", fontWeight: "700", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
+					style={{height: "80%", width:"8rem", fontSize: "18px", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
 					Delete category
 				</Button>
 			</div>
