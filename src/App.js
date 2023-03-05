@@ -1,11 +1,23 @@
 import React, { useState } from 'react';
 import './App.css';
 import { Form, Input, TimePicker, DatePicker, Radio, InputNumber, Button, Table } from 'antd';
+import { CloseOutlined } from '@ant-design/icons'
 import moment from 'moment';
 
 function App() {
 	// Show input form when isAddNew
+	const [wantToAdd, setWantToAdd] = useState(false);
 	const [isAddNew, setIsAddNew] = useState(false);
+
+	// Date & Time
+	const [selectedDate, setSelectedDate] = useState("");
+	const handleDateChange = (date) => {
+		setSelectedDate(date);
+	};
+
+	const handleTimeChange = (time) => {
+		setSelectedDate(moment(`${selectedDate.format('YYYY-MM-DD')} ${time.format('HH:mm:ss')}`));
+	};
 
 	// For adding categories
 	const [incomeCat, setIncomeCat] = useState(['salary', 'bonus', 'investment', 'sell', 'borrow', 'others']);
@@ -20,18 +32,20 @@ function App() {
 	const handlePaymentTyping = (e) => {
 		setAddPaymentCat(e.target.value);
 	};
-
 	const handleAddIncomeCat = () => {
-		if (addIncomeCat !== '') {
-			setIncomeCat([...incomeCat, addIncomeCat]);
-			setAddIncomeCat('');
+		// If new input is already in income category, don't add new
+		if (addIncomeCat !== '' && !incomeCat.includes(addIncomeCat)) {
+		  setIncomeCat([...incomeCat, addIncomeCat]);
 		}
+		setAddIncomeCat('');
 	};
+
 	const handleAddPaymentCat = () => {
-		if (addPaymentCat !== '') {
+		// If new input is already in payment category, don't add new
+		if (addPaymentCat !== '' && !paymentCat.includes(addPaymentCat)) {
 			setPaymentCat([...paymentCat, addPaymentCat]);
-			setAddPaymentCat('');
 		}
+		setAddPaymentCat('');
 	};
 	  
 	// Changing color depends on type
@@ -50,7 +64,7 @@ function App() {
 	const columns = [
 		{
 			title: 'Name',
-			dataIndex: 'Name',
+			dataIndex: 'name',
 			sorter: (a, b) => a.name.localeCompare(b.name),
 		},
 		{
@@ -62,6 +76,10 @@ function App() {
 			title: 'Type',
 			dataIndex: 'type',
 			sorter: (a, b) => a.type.localeCompare(b.type),
+			render: (text, record) => {
+				const isIncome = (record.type === 'income');
+				return <span className={isIncome ? 'income_text_table' : 'payment_text_table'}>{text}</span>;
+			}
 		},
 		{
 			title: 'Category',
@@ -71,7 +89,12 @@ function App() {
 		{
 			title: 'Amount',
 			dataIndex: 'amount',
-			sorter: (a, b) => a.type.localeCompare(b.type),
+			sorter: (a, b) => parseInt(a.amount) - parseInt(b.amount),
+			render: (text, record) => {
+				const amount = `${text} ฿`;
+				const isIncome = record.type === 'income';
+				return <span className={isIncome ? 'income_text_table' : 'payment_text_table'}>{amount}</span>;
+			}
 		},
 	];
 		
@@ -90,7 +113,7 @@ function App() {
 				amount: values.amount,
 			};
 			setData([...data, newData]);
-
+			setIsAddNew(false);
 			form.resetFields();
 		});
 	};
@@ -104,7 +127,12 @@ function App() {
 				<h1>Expense Tracker</h1>
 			</div>
 					
-			<Table dataSource={data} columns={columns} style={{width: "100%", marginBottom: "2rem"}} />
+			<Table
+				dataSource={data}
+				columns={columns}
+				style={{width: "100%", height: "500px", marginBottom: "2rem"}}
+				pagination={{ defaultPageSize: 7}}
+			/>
 
 			<Button onClick={() => setIsAddNew(true)} style={{marginBottom: "1rem"}}>
 				Add a record
@@ -115,15 +143,19 @@ function App() {
 				<Form form={form} onFinish={handleSubmit}>
 
 				<Form.Item label="Name" name="activity">
-					<Input placeholder="Activity" name="activity" />
+					<Input placeholder="Activity" />
 				</Form.Item>
 
 				<Form.Item label="Date">
-					<DatePicker defaultValue={now} />
-					<TimePicker defaultValue={now} format={'HH:mm'}  />
+					<DatePicker value={selectedDate} onChange={handleDateChange} />
+					<TimePicker value={selectedDate} onChange={handleTimeChange} format={'HH:mm'} />
 				</Form.Item>
 
-				<Form.Item label="Type">
+				<Form.Item
+					label="Type"
+					name="type"
+					rules={[{ required: true, message: 'Type is required' }]}
+				>
 					<Radio.Group buttonStyle="solid" onChange={handleTypeChange}>
 						<Radio.Button
 							value="income"
@@ -164,8 +196,15 @@ function App() {
 
 						{/* Add new incomeCat */}
 						<div style={{display: "flex", marginTop: "1rem"}}>
-							<Input placeholder="Add new income category" value={addIncomeCat} onChange={handleIncomeTyping} />
-							<Button type="primary" onClick={handleAddIncomeCat}>Add</Button>
+							{ !wantToAdd && <Button type="dashed" onClick={() => setWantToAdd(true)}>Add new category</Button> }
+							
+							{ wantToAdd && (
+								<div style={{ display: 'flex', alignItems: 'center' }}>
+								<Input placeholder="Add new income category" value={addIncomeCat} onChange={handleIncomeTyping} />
+								<Button type="primary" onClick={handleAddIncomeCat} style={{marginRight: "0.5rem"}}>Add</Button>
+								<Button onClick={() => setWantToAdd(false)} icon={<CloseOutlined />} style={{width: "2.5rem"}}/>
+								</div>
+							)}
 						</div>
 
 						</Radio.Group>
@@ -190,14 +229,30 @@ function App() {
 
 						{/* Add new paymentCat */}
 						<div style={{display: "flex", marginTop: "1rem"}}>
-							<Input placeholder="Add new payment category" value={addPaymentCat} onChange={handlePaymentTyping} />
-							<Button type="primary" onClick={handleAddPaymentCat}>Add</Button>
+							{ !wantToAdd && <Button type="dashed" onClick={() => setWantToAdd(true)}>Add new category</Button> }
+							
+							{ wantToAdd && (
+								<div style={{ display: 'flex', alignItems: 'center' }}>
+								<Input placeholder="Add new payment category" value={addPaymentCat} onChange={handlePaymentTyping} />
+								<Button type="primary" onClick={handleAddPaymentCat} style={{marginRight: "0.5rem"}}>Add</Button>
+								<Button onClick={() => setWantToAdd(false)} icon={<CloseOutlined />} style={{width: "2.5rem"}}/>
+								</div>
+							)}
 						</div>
 						</Radio.Group>
 					)}
 				</Form.Item>
 
-				<Form.Item label="Amount" name="amount">
+				<Form.Item
+					label="Amount"
+					name="amount"
+					rules={[
+						{
+						  required: true,
+						  message: 'Price is required',
+						},
+					  ]}
+				>
 					<InputNumber
 						placeholder="Amount"
 						min={0}
