@@ -147,7 +147,7 @@ function App() {
 			<Table
 				dataSource={catFilter ? data.filter((item) => item.category === catFilter) : data}
 				columns={columns}
-				style={{ width: "100%", height: "400px", marginBottom: "2rem" }}
+				style={{ width: "100%", height: "400px", marginBottom: "2rem", overflow: "scroll" }}
 				pagination={{ defaultPageSize: 6 }}
 			/>
 
@@ -189,7 +189,7 @@ function App() {
 			</div>
 
 
-			<div className="buttons_container">
+			<div className="buttons_container" style={{visibility: isAddNew ? 'hidden' : 'visible'}}>
 			<Button
 				onClick={() => setToggleFind(!toggleFind)}
 				style={{height: "80%", width:"8rem", fontSize: "18px", fontWeight: "700", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
