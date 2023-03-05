@@ -107,7 +107,7 @@ function App() {
 			const newData = {
 				key: data.length + 1,
 				name: values.activity,
-				date: `${moment(values.date).format('DD/MM/YYYY')} ${moment(values.time).format('HH:mm')}`,
+				date: selectedDate.format("DD/MM/YYYY HH:mm"),
 				type: selectedButton,
 				category: selectedCat,
 				amount: values.amount,
@@ -147,7 +147,7 @@ function App() {
 				</Form.Item>
 
 				<Form.Item label="Date">
-					<DatePicker value={selectedDate} onChange={handleDateChange} />
+					<DatePicker value={selectedDate} onChange={handleDateChange} format={'DD/MM/YYYY'} />
 					<TimePicker value={selectedDate} onChange={handleTimeChange} format={'HH:mm'} />
 				</Form.Item>
 
