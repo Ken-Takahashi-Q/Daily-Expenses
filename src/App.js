@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import { useLocalStorage } from 'usehooks-ts'
 import './App.css';
-import { Form, Input, TimePicker, DatePicker, Radio, InputNumber, Button, Table } from 'antd';
-import { CloseOutlined } from '@ant-design/icons'
+import { Form, Input, TimePicker, DatePicker, Radio, InputNumber, Button, Table, Popconfirm, Typography } from 'antd';
+import { CloseOutlined, DeleteOutlined } from '@ant-design/icons'
 import moment from 'moment';
 
 function App() {
 	// Show input form when isAddNew
 	const [wantToAdd, setWantToAdd] = useState(false);
 	const [isAddNew, setIsAddNew] = useState(false);
+
+	const handleAddNew = () => {
+		setIsAddNew(true);
+		setToggleFind(false);
+		setToggleEdit(false);
+	}
 
 	// Date & Time
 	const [selectedDate, setSelectedDate] = useState("");
@@ -39,6 +45,7 @@ function App() {
 		  setIncomeCat([...incomeCat, addIncomeCat]);
 		}
 		setAddIncomeCat('');
+		setWantToAdd(false);
 	};
 
 	const handleAddPaymentCat = () => {
@@ -47,6 +54,7 @@ function App() {
 			setPaymentCat([...paymentCat, addPaymentCat]);
 		}
 		setAddPaymentCat('');
+		setWantToAdd(false);
 	};
 	  
 	// Changing color depends on type
@@ -130,16 +138,47 @@ function App() {
 	
 	const handleFilter = (e) => {
 		setCatFilter(e.target.value);
-	};
-	  
-	  
+		setToggleEdit(false);
+		setToggleFind(!toggleFind);
+	}
+
 	const handleFilterCancel = () => {
 		setCatFilter(null);
 		setToggleFind(false);
 	}
 
+	// Edit existing category
+	const [toggleEdit, setToggleEdit] = useState(false);
+	const [catToDel, setCatToDel] = useState(null)
+	// const handleDelCat = (delCat) => {
+	// 	const allCat = [...incomeCat, ...paymentCat]
+	// 	setDelCat(allCat.filter((category) => category !== delCat));
+	// }
+	const handleEditCat = () => {
+		setToggleEdit(!toggleEdit);
+		setToggleFind(false);
+	};
+	
+	const handleDelSelect = (category) => {
+		setCatToDel(category);
+	};
+	
+	const handleCatDel = () => {
+		if (catToDel) {
+		  const updatedCats = [...incomeCat];
+		  const index = updatedCats.indexOf(catToDel);
+		  if (index !== -1) {
+			updatedCats.splice(index, 1);
+			setIncomeCat(updatedCats);
+		  }
+		  setCatToDel(null);
+		}
+	  };
+	  
+	  
+
 	return (
-		<div className="app">
+		<body>
 			<div className="app_title">
 				<h1>Expense Tracker</h1>
 			</div>
@@ -147,16 +186,14 @@ function App() {
 			<Table
 				dataSource={catFilter ? data.filter((item) => item.category === catFilter) : data}
 				columns={columns}
-				style={{ width: "100%", height: "400px", marginBottom: "2rem", overflow: "scroll" }}
+				style={{ width: "100%", height: "400px", marginBottom: "2rem"}}
 				pagination={{ defaultPageSize: 6 }}
 			/>
 
-
-			<div className="menus" style={{visibility: toggleFind ? 'visible': 'hidden', transition: "0s"}}>
+			{/* For filtering type and category */}
+			<div className="menus finding" style={{visibility: toggleFind ? 'visible': 'hidden', transition: "0s"}}>
 				<>
-				
 				<Radio.Group buttonStyle="solid" onChange={handleFilter}>
-					<Radio.Button value="income">Income</Radio.Button>
 					{/* Render income buttons using incomeCat */}
 					{incomeCat.map((category) => {
 						return (
@@ -169,7 +206,6 @@ function App() {
 						)
 					})};
 
-					<Radio.Button value="payment">Payment</Radio.Button>
 					{paymentCat.map((category) => {
 						return (
 							<Radio.Button
@@ -183,28 +219,61 @@ function App() {
 				</Radio.Group>
 				</>
 
-				<>
+				<div style={{ display: "flex", justifyContent: "center" }}>
 				<Button className="close_form" onClick={handleFilterCancel} style={{width: "5rem"}}>Cancel</Button>
+				</div>
+			</div>
+
+			{/* For deleting category */}
+			<div className="menus editing" style={{visibility: toggleEdit ? 'visible': 'hidden', transition: "0s"}}>
+				<>
+				<Radio.Group buttonStyle="solid" onChange={handleDelSelect}>
+					<Radio.Button value="income">Income</Radio.Button>
+					{incomeCat.map((category) => {
+						return (
+							<Radio.Button key={category} value={category}>
+								{category}
+							</Radio.Button>
+						)
+					})};
+
+					<Radio.Button value="payment">Payment</Radio.Button>
+					{paymentCat.map((category) => {
+						return (
+							<Radio.Button key={category} value={category} >
+								{category}
+							</Radio.Button>
+						)
+					})};
+				</Radio.Group>
 				</>
+
+				<div style={{display: "flex", justifyContent: "center", gap: "1rem"}}>
+					<Button onClick={handleCatDel} icon={<DeleteOutlined />} style={{width: "5rem", backgroundColor: "#ff6947"}}/>
+					<Button className="close_form" onClick={() => setToggleEdit(false)} style={{width: "5rem"}}>Cancel</Button>
+				</div>
 			</div>
 
-
+			{/* 3 buttons, Filter, Add new, Edit cat */}
 			<div className="buttons_container" style={{visibility: isAddNew ? 'hidden' : 'visible'}}>
-			<Button
-				onClick={() => setToggleFind(!toggleFind)}
-				style={{height: "80%", width:"8rem", fontSize: "18px", fontWeight: "700", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
-				Find
-			</Button>
+				<Button
+					onClick={handleFilter}
+					style={{height: "80%", width:"8rem", fontSize: "18px", fontWeight: "700", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
+					Filter
+				</Button>
 
-			<Button onClick={() => setIsAddNew(true)} style={{height: "100%", width:"8rem", color: "white", backgroundColor: "var(--add-btn-color)", fontSize: "18px", fontWeight: "700", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
-				Add new
-			</Button>
+				<Button onClick={handleAddNew} style={{height: "100%", width:"8rem", color: "white", backgroundColor: "var(--add-btn-color)", fontSize: "18px", fontWeight: "700", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
+					Add new
+				</Button>
 
-			<Button style={{height: "80%", width:"8rem", fontSize: "18px", fontWeight: "700", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
-				Edit category
-			</Button>
+				<Button
+					onClick={handleEditCat}
+					style={{height: "80%", width:"8rem", fontSize: "18px", fontWeight: "700", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
+					Edit category
+				</Button>
 			</div>
 
+			{/* When 'Add new' is clicked, show input fields */}
 			{isAddNew && (
 				<div className={`add_new ${isAddNew ? 'slide-up' : ''}`}>
 				<Form form={form} onFinish={handleSubmit}>
@@ -335,7 +404,7 @@ function App() {
 				</div>
 				)}
 
-		</div>
+		</body>
 	);
 }
 

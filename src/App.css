@@ -16,7 +16,7 @@
 	--payment-color: #e06648;
 	--add-btn-color: rgb(48, 130, 48);
 }
-.app {
+body {
 	display: flex;
 	flex-direction: column;
 	justify-content: start;
@@ -68,6 +68,7 @@
 .menus {
 	display: flex;
 	flex-direction: column;
+	position: absolute;
 	padding: 0.5rem 1rem 0.5rem 1rem;
 	gap: 1rem;
 	background-color: rgba(232, 232, 232, 0.7);
@@ -137,13 +138,17 @@
 }
 
 @media only screen and (max-width: 700px) {
-	.app {
+	* {
+		font-weight: 400;
+	}
+	body {
+		width: 100vw;
 		padding: 0.5rem 0;
-		width: 100%;
+		
 		font-size: 16px;
-		overflow: hidden;
 	}
 	.button_container {
+		flex-direction: column;
 		width: 100%;
 	}
 	.add_new {
