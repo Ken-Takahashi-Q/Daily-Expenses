@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocalStorage } from 'usehooks-ts'
 import './App.css';
 import { Form, Input, TimePicker, DatePicker, Radio, InputNumber, Button, Table } from 'antd';
 import { CloseOutlined } from '@ant-design/icons'
@@ -54,6 +55,7 @@ function App() {
 
 	const handleTypeChange = (e) => {
 		setSelectedButton(e.target.value);
+		console.log(catFilter);
 	};
 
 	const handleCatChange = (e) => {
@@ -63,9 +65,9 @@ function App() {
 	// Formats of table
 	const columns = [
 		{
-			title: 'Name',
-			dataIndex: 'name',
-			sorter: (a, b) => a.name.localeCompare(b.name),
+			title: 'Activity',
+			dataIndex: 'activity',
+			sorter: (a, b) => a.activity.localeCompare(b.name),
 		},
 		{
 			title: 'Date-time',
@@ -100,13 +102,13 @@ function App() {
 		
 	// Submit, Add data into table, and clear data
 	const [form] = Form.useForm();
-	const [data, setData] = useState([]);
+	const [data, setData] = useLocalStorage('columns', [])
 
 	const handleSubmit = () => {
 		form.validateFields().then((values) => {
 			const newData = {
 				key: data.length + 1,
-				name: values.activity,
+				activity: values.activity,
 				date: selectedDate.format("DD/MM/YYYY HH:mm"),
 				type: selectedButton,
 				category: selectedCat,
@@ -121,6 +123,21 @@ function App() {
 	// Get date and time to use as default
 	const now = moment();
 
+	// Menus and filter category
+	const [toggleFind, setToggleFind] = useState(false);
+	const [typeFilter, setTypeFilter] = useState(null);
+	const [catFilter, setCatFilter] = useState(null);
+	
+	const handleFilter = (e) => {
+		setCatFilter(e.target.value);
+	};
+	  
+	  
+	const handleFilterCancel = () => {
+		setCatFilter(null);
+		setToggleFind(false);
+	}
+
 	return (
 		<div className="app">
 			<div className="app_title">
@@ -128,22 +145,72 @@ function App() {
 			</div>
 					
 			<Table
-				dataSource={data}
+				dataSource={catFilter ? data.filter((item) => item.category === catFilter) : data}
 				columns={columns}
-				style={{width: "100%", height: "500px", marginBottom: "2rem"}}
-				pagination={{ defaultPageSize: 7}}
+				style={{ width: "100%", height: "400px", marginBottom: "2rem" }}
+				pagination={{ defaultPageSize: 6 }}
 			/>
 
-			<Button onClick={() => setIsAddNew(true)} style={{marginBottom: "1rem"}}>
-				Add a record
+
+			<div className="menus" style={{visibility: toggleFind ? 'visible': 'hidden', transition: "0s"}}>
+				<>
+				
+				<Radio.Group buttonStyle="solid" onChange={handleFilter}>
+					<Radio.Button value="income">Income</Radio.Button>
+					{/* Render income buttons using incomeCat */}
+					{incomeCat.map((category) => {
+						return (
+							<Radio.Button
+							key={category}
+							value={category}
+							>
+							{category}
+							</Radio.Button>
+						)
+					})};
+
+					<Radio.Button value="payment">Payment</Radio.Button>
+					{paymentCat.map((category) => {
+						return (
+							<Radio.Button
+							key={category}
+							value={category}
+							>
+							{category}
+							</Radio.Button>
+						)
+					})};
+				</Radio.Group>
+				</>
+
+				<>
+				<Button className="close_form" onClick={handleFilterCancel} style={{width: "5rem"}}>Cancel</Button>
+				</>
+			</div>
+
+
+			<div className="buttons_container">
+			<Button
+				onClick={() => setToggleFind(!toggleFind)}
+				style={{height: "80%", width:"8rem", fontSize: "18px", fontWeight: "700", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
+				Find
 			</Button>
+
+			<Button onClick={() => setIsAddNew(true)} style={{height: "100%", width:"8rem", color: "white", backgroundColor: "var(--add-btn-color)", fontSize: "18px", fontWeight: "700", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
+				Add new
+			</Button>
+
+			<Button style={{height: "80%", width:"8rem", fontSize: "18px", fontWeight: "700", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
+				Edit category
+			</Button>
+			</div>
 
 			{isAddNew && (
 				<div className={`add_new ${isAddNew ? 'slide-up' : ''}`}>
 				<Form form={form} onFinish={handleSubmit}>
 
-				<Form.Item label="Name" name="activity">
-					<Input placeholder="Activity" />
+				<Form.Item label="Activity" name="activity">
+					<Input placeholder="Your activity" />
 				</Form.Item>
 
 				<Form.Item label="Date">
@@ -181,7 +248,6 @@ function App() {
 						
 						{/* Render income buttons using incomeCat */}
 						{incomeCat.map((category) => {
-							console.log("category:", category);
 							return (
 								<Radio.Button
 								key={category}
