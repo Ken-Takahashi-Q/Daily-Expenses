@@ -84,7 +84,8 @@ function App() {
 				  return 1;
 				}
 				return a.activity.localeCompare(b.activity);
-			  },
+			},
+			width: "10%"
 		},
 		{
 			title: 'Date-time',
@@ -98,12 +99,14 @@ function App() {
 			render: (text, record) => {
 				const isIncome = (record.type === 'income');
 				return <span className={isIncome ? 'income_text_table' : 'payment_text_table'}>{text}</span>;
-			}
+			},
+			responsive: ["sm"]
 		},
 		{
 			title: 'Category',
 			dataIndex: 'category',
 			sorter: (a, b) => a.type.localeCompare(b.type),
+			width: "10%"
 		},
 		{
 			title: 'Amount',
@@ -136,9 +139,6 @@ function App() {
 			form.resetFields();
 		});
 	};
-
-	// Get date and time to use as default
-	const now = moment();
 
 	// Menus and filter category
 	const [toggleFind, setToggleFind] = useState(false);
@@ -245,104 +245,106 @@ function App() {
 					(!typeFilter || item.type === typeFilter)
 				)}
 				columns={columns}
-				style={{ width: "100%", height: "400px", marginBottom: "2rem"}}
-				pagination={{ defaultPageSize: 6 }}
+				style={{ width: "100%", marginBottom: "1rem", overflow: "auto"}}
+				pagination={{ defaultPageSize: 5 }}
 			/>
 
-			{/* For filtering type and category */}
-			<div className="menus" style={{visibility: toggleFind||toggleEdit ? 'visible': 'hidden', marginBottom: "1rem", transition: "0s"}}>
-			{/* Create unvisible box, show filter buttons */}
-			{!toggleEdit ? 
-				<>
-				<>
-				<Radio.Group buttonStyle="solid" onChange={handleTypeFilter}>
-					<Radio.Button value="income">Income</Radio.Button>
-					<Radio.Button value="payment">Payment</Radio.Button>
-				</Radio.Group>
+			<div className="container">
+				{/* 3 buttons, Filter, Add new, Edit cat */}
+				<div className="buttons_container" style={{visibility: isAddNew ? 'hidden' : 'visible'}}>
+					<Button
+						onClick={handleFilterToggle}
+						style={{height: "80%", width:"7rem", fontSize: "14px", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
+						Filter
+					</Button>
 
-				<Radio.Group buttonStyle="solid" onChange={handleFilter}>
-					{/* Render income buttons using incomeCat */}
-					{incomeCat.map((category) => {
-						return (
-							<Radio.Button
-							key={category}
-							value={category}
-							>
-							{category}
-							</Radio.Button>
-						)
-					})};
-					
-					{paymentCat.map((category) => {
-						return (
-							<Radio.Button
-							key={category}
-							value={category}
-							>
-							{category}
-							</Radio.Button>
-						)
-					})};
-				</Radio.Group>
-				</>
+					<Button onClick={handleAddNew} style={{height: "100%", width:"7rem", color: "white", backgroundColor: "var(--add-btn-color)", fontSize: "14px", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
+						Add new
+					</Button>
 
-				<div style={{ display: "flex", justifyContent: "center", gap: "1rem" }}>
-				<Button type="primary" className="close_form" onClick={handleShowAll} style={{width: "5rem", backgroundColor: "var(--add-btn-color)"}}>Show all</Button>
-				<Button className="close_form" onClick={handleFilterCancel} style={{width: "5rem"}}>Cancel</Button>
+					<Button
+						onClick={handleEditCat}
+						style={{height: "80%", width:"7rem", fontSize: "14px", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
+						Delete category
+					</Button>
 				</div>
-				</> :
-				null
-			}
-			{/* Delete category buttons */}
-			{toggleEdit ? 
-				<>
-				<>
-				<Radio.Group buttonStyle="solid" onChange={handleDelSelect}>
-					{incomeCat.map((category) => {
-						return (
-							<Radio.Button key={category} value={category}
-							check={category===catToDel}>
-								{category}
-							</Radio.Button>
-						)
-					})};
 
-					{paymentCat.map((category) => {
-						return (
-							<Radio.Button key={category} value={category} check={category===catToDel}>
-								{category}
-							</Radio.Button>
-						)
-					})};
-				</Radio.Group>
-				</>
+				{/* For filtering type and category */}
+				<div className="menus" style={{display: toggleFind||toggleEdit ? 'block': 'none'}}>
+				{/* Create unvisible box, show filter buttons */}
+				{!toggleEdit ? 
+					<>
+					<>
+					<Radio.Group buttonStyle="solid" onChange={handleTypeFilter} style={{marginBottom: "0.5rem"}}>
+						<Radio.Button value="income">Income</Radio.Button>
+						<Radio.Button value="payment">Payment</Radio.Button>
+					</Radio.Group>
 
-				<div style={{display: "flex", justifyContent: "center", gap: "1rem"}}>
-					<Button onClick={handleCatDel} icon={<DeleteOutlined />} style={{width: "5rem", backgroundColor: "#ff6947"}}/>
-					<Button className="close_form" onClick={() => setToggleEdit(false)} style={{width: "5rem"}}>Cancel</Button>
+					<Radio.Group buttonStyle="solid" onChange={handleFilter}>
+						{/* Render income buttons using incomeCat */}
+						{incomeCat.map((category) => {
+							return (
+								<Radio.Button
+								key={category}
+								value={category}
+								>
+								{category}
+								</Radio.Button>
+							)
+						})};
+						
+						{paymentCat.map((category) => {
+							return (
+								<Radio.Button
+								key={category}
+								value={category}
+								>
+								{category}
+								</Radio.Button>
+							)
+						})};
+					</Radio.Group>
+					</>
+
+					<div style={{ display: "flex", justifyContent: "center", gap: "1rem", marginTop: "0.5rem" }}>
+					<Button type="primary" className="close_form" onClick={handleShowAll} style={{width: "5rem", backgroundColor: "var(--add-btn-color)"}}>Show all</Button>
+					<Button className="close_form" onClick={handleFilterCancel} style={{width: "5rem"}}>Cancel</Button>
+					</div>
+					</> :
+					null
+				}
+				{/* Delete category buttons */}
+				{toggleEdit ? 
+					<>
+					<>
+					<Radio.Group buttonStyle="solid" onChange={handleDelSelect}>
+						{incomeCat.map((category) => {
+							return (
+								<Radio.Button key={category} value={category}
+								check={category===catToDel}>
+									{category}
+								</Radio.Button>
+							)
+						})};
+
+						{paymentCat.map((category) => {
+							return (
+								<Radio.Button key={category} value={category} check={category===catToDel}>
+									{category}
+								</Radio.Button>
+							)
+						})};
+					</Radio.Group>
+					</>
+
+					<div style={{display: "flex", justifyContent: "center", gap: "1rem", marginTop: "0.5rem"}}>
+						<Button onClick={handleCatDel} icon={<DeleteOutlined />} style={{width: "5rem", backgroundColor: "#ff6947"}}/>
+						<Button className="close_form" onClick={() => setToggleEdit(false)} style={{width: "5rem"}}>Cancel</Button>
+					</div>
+					</> :
+					null
+				}
 				</div>
-				</> :
-				null
-			}
-			</div>
-
-			{/* 3 buttons, Filter, Add new, Edit cat */}
-			<div className="buttons_container" style={{visibility: isAddNew ? 'hidden' : 'visible'}}>
-				<Button
-					onClick={handleFilterToggle}
-					style={{height: "80%", width:"8rem", fontSize: "18px", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
-					Filter
-				</Button>
-
-				<Button onClick={handleAddNew} style={{height: "100%", width:"8rem", color: "white", backgroundColor: "var(--add-btn-color)", fontSize: "18px", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
-					Add new
-				</Button>
-
-				<Button
-					onClick={handleEditCat}
-					style={{height: "80%", width:"8rem", fontSize: "18px", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
-					Delete category
-				</Button>
 			</div>
 
 			{/* When 'Add new' is clicked, show input fields */}
