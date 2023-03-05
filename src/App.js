@@ -254,17 +254,17 @@ function App() {
 				<div className="buttons_container" style={{visibility: isAddNew ? 'hidden' : 'visible'}}>
 					<Button
 						onClick={handleFilterToggle}
-						style={{height: "80%", width:"7rem", fontSize: "14px", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
+						style={{height: "80%", width:"7rem", fontSize: "12px", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
 						Filter
 					</Button>
 
-					<Button onClick={handleAddNew} style={{height: "100%", width:"7rem", color: "white", backgroundColor: "var(--add-btn-color)", fontSize: "14px", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
+					<Button onClick={handleAddNew} style={{height: "100%", width:"7rem", color: "white", backgroundColor: "var(--add-btn-color)", fontSize: "12px", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
 						Add new
 					</Button>
 
 					<Button
 						onClick={handleEditCat}
-						style={{height: "80%", width:"7rem", fontSize: "14px", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
+						style={{height: "80%", width:"7rem", fontSize: "12px", boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
 						Delete category
 					</Button>
 				</div>
