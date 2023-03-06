@@ -18,14 +18,8 @@ function App() {
 	}
 
 	// Date & Time
-	const [selectedDate, setSelectedDate] = useState("");
-	const handleDateChange = (date) => {
-		setSelectedDate(date);
-	};
-
-	const handleTimeChange = (time) => {
-		setSelectedDate(moment(`${selectedDate.format('YYYY-MM-DD')} ${time.format('HH:mm:ss')}`));
-	};
+	const [selectedDate, setSelectedDate] = useState(moment());
+	const [selectedTime, setSelectedTime] = useState(null);
 
 	// For adding categories
 	const [incomeCat, setIncomeCat] = useState(['salary', 'bonus', 'investment', 'sell', 'borrow', 'others']);
@@ -129,7 +123,7 @@ function App() {
 			const newData = {
 				key: data.length + 1,
 				activity: values.activity,
-				date: selectedDate.format("DD/MM/YYYY HH:mm"),
+				date: `${selectedDate.format('DD/MM/YYYY')} ${selectedTime.format('HH:mm')}`,
 				type: selectedButton,
 				category: selectedCat,
 				amount: values.amount,
@@ -357,8 +351,8 @@ function App() {
 				</Form.Item>
 
 				<Form.Item label="Date">
-					<DatePicker value={selectedDate} onChange={handleDateChange} format={'DD/MM/YYYY'} />
-					<TimePicker value={selectedDate} onChange={handleTimeChange} format={'HH:mm'} />
+					<DatePicker value={selectedDate} onChange={(date) => {setSelectedDate(date)}} format={'DD/MM/YYYY'} />
+					<TimePicker value={selectedTime} onChange={(time) => {setSelectedTime(time)}} format={'HH:mm'} />
 				</Form.Item>
 
 				<Form.Item
