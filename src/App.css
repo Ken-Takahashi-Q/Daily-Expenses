@@ -37,6 +37,11 @@ body {
 	text-align: center;
 	text-shadow: 1px 2px 2px black;
 }
+
+.chart_block {
+	width: 100%;
+	justify-content: center;
+}
 .records {
 	display: flex;
 	flex-direction: column;
@@ -138,6 +143,9 @@ body {
 		width: 100vw;
 		padding: 0.5rem 0;
 		font-size: 14px;
+	}
+	.chart_block {
+		flex-direction: column;
 	}
 	.ant-table table {
 		font-size: 10px;

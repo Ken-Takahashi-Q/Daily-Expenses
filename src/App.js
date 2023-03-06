@@ -193,6 +193,17 @@ function App() {
 
 	// Create circle chart
 	const [viewChart, setViewChart] = useState(false);
+	const dataByType = data.reduce((result, item) => {
+		if (!result[item.type]) {
+			result[item.type] = {
+				type: item.type,
+				amount: 0,
+			};
+		}
+		result[item.type].amount += parseFloat(item.amount);
+		return result;
+	}, {});
+
 	const dataByCategory = data.reduce((result, item) => {
 		if (!result[item.category]) {
 			result[item.category] = {
@@ -204,7 +215,8 @@ function App() {
 		return result;
 	}, {});
 
-	const chartData = Object.values(dataByCategory).sort((a, b) => b.amount - a.amount);
+	const chartDataType = Object.values(dataByType).sort((a, b) => b.amount - a.amount);
+	const chartDataCat = Object.values(dataByCategory).sort((a, b) => b.amount - a.amount);
 	const chartColors = ['#0088fe', '#00c49f', '#ffbb28', '#ff8042', '#8884d8', '#ff7d7d', '#ce8ade'];
 	  
 	return (
@@ -214,10 +226,27 @@ function App() {
 				<Button type="primary" onClick={() => setViewChart(!viewChart)} style={{height: "100%", backgroundColor: viewChart ? "var(--payment-color)": ""}}>Overall</Button>
 			</div>
 
-			<div style={{display: viewChart ? 'block' : 'none'}}>
+			<div class="chart_block" style={{display: viewChart ? 'flex' : 'none'}}>
 				<PieChart width={400} height={400}>
 				<Pie
-					data={chartData}
+					data={chartDataType}
+					dataKey="amount"
+					nameKey="type"
+					cx="50%"
+					cy="50%"
+					outerRadius={80}
+					fill="#8884d8"
+					label={(entry) => `${entry.type} (${entry.amount}฿)`}
+				>
+					{chartDataType.map((entry, index) => (
+					<Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
+					))}
+				</Pie>
+				</PieChart>
+
+				<PieChart width={400} height={400}>
+				<Pie
+					data={chartDataCat}
 					dataKey="amount"
 					nameKey="category"
 					cx="50%"
@@ -226,7 +255,7 @@ function App() {
 					fill="#8884d8"
 					label={(entry) => `${entry.category} (${entry.amount}฿)`}
 				>
-					{chartData.map((entry, index) => (
+					{chartDataCat.map((entry, index) => (
 					<Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
 					))}
 				</Pie>
